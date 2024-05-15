@@ -7,7 +7,7 @@ def run(is_training=True, render=False):
 
     env = gym.make('CartPole-v1', render_mode='human' if render else None)
 
-    # Divide position, velocity, pole angle, and pole angular velocity into segments
+
     pos_space = np.linspace(-2.4, 2.4, 10)
     vel_space = np.linspace(-4, 4, 10)
     ang_space = np.linspace(-.2095, .2095, 10)
@@ -27,22 +27,22 @@ def run(is_training=True, render=False):
         q = pickle.load(f)
         f.close()
 
-    learning_rate_a = 0.1 # alpha or learning rate
-    discount_factor_g = 0.99 # gamma or discount factor.
+    learning_rate_a = 0.1 
+    discount_factor_g = 0.99 
     episodes = 100000
-    epsilon = 1         # 1 = 100% random actions
-    epsilon_decay_rate = 0.00001 # epsilon decay rate
-    rng = np.random.default_rng()   # random number generator
+    epsilon = 1         
+    epsilon_decay_rate = 0.00001 
+    rng = np.random.default_rng() 
 
     rewards_per_episode = []
     history = []
 
     i = 0
 
-    # for i in range(episodes):
+
     for episode in range(episodes):
 
-        state = env.reset()[0]      # Starting position, starting velocity always 0
+        state = env.reset()[0]  
         state_p = np.digitize(state[0], pos_space)
         state_v = np.digitize(state[1], vel_space)
         state_a = np.digitize(state[2], ang_space)
@@ -50,7 +50,7 @@ def run(is_training=True, render=False):
 
         action1 = choose_action(state_p, state_v, state_a, state_av)
 
-        terminated = False          # True when reached goal
+        terminated = False         
 
         total_reward=0
 
@@ -83,24 +83,24 @@ def run(is_training=True, render=False):
 
         rewards_per_episode.append(total_reward)
 
-        # Decay epsilon
+
         epsilon = max(epsilon - epsilon_decay_rate, 0.1)
 
-        # Print progress
+      
         if (episode + 1) % 100 == 0:
             mean_rewards = np.mean(rewards_per_episode[-100:])
             print(f"Episode {episode + 1}/{episodes}, Mean Rewards (last 100): {mean_rewards:.2f}")
             history.append(mean_rewards)
             rewards_per_episode = []
 
-            # Check if environment is solved
+
             if mean_rewards >= 195.0:
                 print(f"Environment solved in {episode + 1} episodes!")
                 break
 
     env.close()
 
-    # Save Q table to file
+
     if is_training:
         f = open('cartpole.pkl','wb')
         pickle.dump(q, f)
